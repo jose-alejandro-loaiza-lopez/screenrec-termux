@@ -1,0 +1,13 @@
+# artefactos de build
+classes/
+dexout/
+app*.apk
+app-unsigned.apk
+screenrec-tile.apk.unsigned
+tmp/
+
+# secreto local: cada usuario genera el suyo con build.sh
+ks.jks
+
+# metadata temporal
+*.idsig
