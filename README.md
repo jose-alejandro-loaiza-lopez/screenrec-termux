@@ -54,6 +54,7 @@ El grabador de pantalla integrado en MIUI/HyperOS (Xiaomi/POCO) puede tener limi
 - Android 7 o superior.
 - Instala Termux desde F-Droid: <https://f-droid.org/packages/com.termux/>
 - No uses la versión de Play Store: está desactualizada y puede fallar con `RUN_COMMAND`.
+- Desactiva la optimización de batería para Termux: Ajustes → Apps → Termux → Batería → **Sin restricciones**. Evita que Android pause o cierre Termux durante la grabación.
 
 Abre Termux y actualiza todos los paquetes:
 
