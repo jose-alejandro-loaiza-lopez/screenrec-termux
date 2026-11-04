@@ -46,6 +46,17 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 - Termux instalado y actualizado (`pkg update -y && pkg upgrade -y`)
 - Termux con **acceso externo habilitado**: en `~/.termux/termux.properties` escribir
   `allow-external-apps = true` y reiniciar Termux.
+- Permiso de almacenamiento de Termux (necesario para escribir en `/sdcard/DCIM/ScreenRecorder`):
+
+  ```bash
+  termux-setup-storage
+  ```
+
+  Acepta el diálogo de Android. Verifica con:
+
+  ```bash
+  ls ~/storage/shared/DCIM
+  ```
 - Dependencias en Termux. `scrcpy` está en el repositorio **x11**, que no viene habilitado por defecto:
 
   ```bash
@@ -99,6 +110,7 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
      > "$PREFIX/etc/apt/sources.list.d/x11.list"
    pkg update -y
    pkg install -y scrcpy ffmpeg android-tools
+   termux-setup-storage     # aceptar el permiso de almacenamiento
    mkdir -p ~/bin
    grep -q 'export PATH="$HOME/bin:$PATH"' ~/.bashrc || \
        echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc

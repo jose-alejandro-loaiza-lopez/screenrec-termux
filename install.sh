@@ -6,6 +6,12 @@ cd "$(dirname "$0")"
 PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 export PATH="$PREFIX/bin:$PATH"
 
+# aviso si falta acceso a almacenamiento externo
+if [ ! -d "$HOME/storage/shared" ]; then
+    echo "AVISO: falta el permiso de almacenamiento."
+    echo "Ejecutá 'termux-setup-storage' y aceptá el diálogo de Android."
+fi
+
 # instalar scripts de Termux si el repo los trae
 if [ -d scripts ] && [ -f scripts/screenrec.sh ]; then
     mkdir -p "$HOME/bin"
