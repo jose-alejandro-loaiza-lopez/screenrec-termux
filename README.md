@@ -44,21 +44,17 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 - Termux instalado y actualizado (`pkg upgrade`)
 - Termux con **acceso externo habilitado**: en `~/.termux/termux.properties` escribir
   `allow-external-apps = true` y reiniciar Termux.
-- Dependencias en Termux:
-
-  `scrcpy` está en el repositorio **x11**. Si no lo tienes habilitado:
+- Dependencias en Termux. `scrcpy` está en el repositorio **x11**, que no viene habilitado por defecto:
 
   ```bash
-  termux-change-repo
-  # activa el repo 'x11' (y deja 'main' habilitado)
+  test -f "$PREFIX/etc/apt/sources.list.d/x11.list" || \
+    echo "deb https://packages.termux.dev/apt/termux-x11 x11 main" \
+    > "$PREFIX/etc/apt/sources.list.d/x11.list"
   pkg update
-  ```
-
-  Luego:
-
-  ```bash
   pkg install scrcpy ffmpeg android-tools
   ```
+
+  > `termux-change-repo` sirve para elegir un **mirror**, no para habilitar repositorios. El repo x11 se agrega con el archivo de arriba. Si instalaste `scrcpy` desde un `.deb` manual, funciona, pero no recibe actualizaciones; mejor usar `pkg install scrcpy`.
 
 - ADB disponible por TCP (local) para que `scrcpy` pueda capturar la pantalla:
   - Verificar con `adb devices`.
@@ -92,7 +88,10 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 1. Prepara Termux (dependencias y PATH):
 
    ```bash
-   termux-change-repo          # habilita el repo x11 (scrcpy vive ahí)
+   # opcional: elegir un mirror con termux-change-repo
+   test -f "$PREFIX/etc/apt/sources.list.d/x11.list" || \
+     echo "deb https://packages.termux.dev/apt/termux-x11 x11 main" \
+     > "$PREFIX/etc/apt/sources.list.d/x11.list"
    pkg update
    pkg install scrcpy ffmpeg android-tools
    mkdir -p ~/bin
