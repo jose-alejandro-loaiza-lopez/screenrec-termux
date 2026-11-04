@@ -6,6 +6,15 @@ cd "$(dirname "$0")"
 PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 export PATH="$PREFIX/bin:$PATH"
 
+# instalar scripts de Termux si el repo los trae
+if [ -d scripts ] && [ -f scripts/screenrec.sh ]; then
+    mkdir -p "$HOME/bin"
+    install -m 0755 scripts/screenrec.sh "$HOME/bin/screenrec.sh"
+    if [ -f scripts/qs-tap.sh ]; then
+        install -m 0755 scripts/qs-tap.sh "$HOME/bin/qs-tap.sh"
+    fi
+fi
+
 SERIAL="${SERIAL:-127.0.0.1:5555}"
 APK="screenrec-tile.apk"
 APP="dev.local.screentile"

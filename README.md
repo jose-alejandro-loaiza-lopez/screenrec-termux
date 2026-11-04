@@ -8,7 +8,8 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 - `~/bin/qs-tap.sh` — helper para abrir el panel y tocar un tile por `content-desc`.
 - `dev.local.screentile` (`screenrec-tile.apk`) — tile en el Centro de control + app de configuración.
 - Fuentes Java en `src/dev/local/screentile/`.
-- `build.sh` / `install.sh` — compilación, firma e instalación automatizadas.
+- `build.sh` / `install.sh` — compilación, firma e instalación automatizadas (install.sh también copia `scripts/` a `~/bin`).
+- `scripts/screenrec.sh`, `scripts/qs-tap.sh` — scripts de Termux versionados en el repo.
 - `AndroidManifest.xml` — servicio tile, receiver y activity.
 - `README.md`.
 
