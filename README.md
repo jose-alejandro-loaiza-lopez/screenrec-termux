@@ -42,22 +42,87 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 ## Requisitos
 
 - Android 7+
-- Termux
-- Dependencias en Termux: `scrcpy`, `ffmpeg`, `android-tools` (ADB)
-- `allow-external-apps = true` en `~/.termux/termux.properties`
+- Termux instalado y actualizado (`pkg upgrade`)
+- Termux con **acceso externo habilitado**: en `~/.termux/termux.properties` escribir
+  `allow-external-apps = true` y reiniciar Termux.
+- Dependencias en Termux:
 
-## Instalación
+  ```bash
+  pkg install scrcpy ffmpeg android-tools
+  ```
 
-```bash
-pkg install scrcpy ffmpeg android-tools
-cd ~/projects/screenrec
-./build.sh
-./install.sh
-```
+- ADB disponible por TCP (local) para que `scrcpy` pueda capturar la pantalla:
+  - Verificar con `adb devices`.
+  - Si no aparece `127.0.0.1:5555 device`, habilitar ADB por TCP con alguno de estos métodos:
 
-`install.sh` instala el APK y concede el permiso `com.termux.permission.RUN_COMMAND`.
+    **Método A (si el ROM ya lo expone, como muchos MIUI/Xiaomi):**
+    no hace falta hacer nada.
 
-Rebuild manual:
+    **Método B (con root, desde Termux):**
+    ```bash
+    tsu -c "setprop service.adb.tcp.port 5555; stop adbd; start adbd"
+    ```
+
+    **Método C (desde USB/ADB en una PC):**
+    ```bash
+    adb devices
+    adb tcpip 5555
+    adb connect 127.0.0.1:5555
+    ```
+
+    **Método D (Android 11+ emparejamiento inalámbrico):**
+    usar `adb pair` y `adb connect`, luego exportar `SERIAL` con el puerto asignado:
+    ```bash
+    SERIAL=127.0.0.1:<puerto> ~/bin/screenrec.sh start
+    ```
+  - Si tu dispositivo usa un puerto distinto de 5555, redefine `SERIAL` por entorno.
+- El tile necesita permiso `com.termux.permission.RUN_COMMAND` (otorgado por `install.sh`).
+
+## Instalación paso a paso
+
+1. Prepara Termux (dependencias y PATH):
+
+   ```bash
+   pkg install scrcpy ffmpeg android-tools
+   mkdir -p ~/bin
+   grep -q 'export PATH="$HOME/bin:$PATH"' ~/.bashrc || \
+       echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
+   source ~/.bashrc
+   ```
+
+2. Clona/copiá el proyecto:
+
+   ```bash
+   git clone https://github.com/jose-alejandro-loaiza-lopez/screenrec-termux.git ~/projects/screenrec
+   cd ~/projects/screenrec
+   ```
+
+3. Compila y firma:
+
+   ```bash
+   ./build.sh
+   ```
+
+   (Si falta `ks.jks`, `build.sh` lo genera con clave de desarrollo.)
+
+4. Instala y concede permiso:
+
+   ```bash
+   ./install.sh
+   ```
+
+5. Agrega el tile **Grabar pantalla** al Centro de control (editor de tiles, si no aparece solo).
+
+6. Prueba:
+
+   ```bash
+   ~/bin/screenrec.sh start
+   # graba unos segundos
+   ~/bin/screenrec.sh stop
+   ls -lh /sdcard/DCIM/ScreenRecorder
+   ```
+
+Rebuild / reinstall manual:
 
 ```bash
 cd ~/projects/screenrec
