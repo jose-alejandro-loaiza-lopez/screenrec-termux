@@ -15,6 +15,14 @@ if [ -d scripts ] && [ -f scripts/screenrec.sh ]; then
     fi
 fi
 
+# asegurar que ~/bin este en PATH (idempotente)
+if [ -f "$HOME/.bashrc" ]; then
+    grep -q 'export PATH="\$HOME/bin:\$PATH"' "$HOME/.bashrc" || \
+        echo 'export PATH="$HOME/bin:$PATH"' >>"$HOME/.bashrc"
+else
+    echo 'export PATH="$HOME/bin:$PATH"' >"$HOME/.bashrc"
+fi
+
 SERIAL="${SERIAL:-127.0.0.1:5555}"
 APK="screenrec-tile.apk"
 APP="dev.local.screentile"
