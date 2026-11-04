@@ -98,11 +98,14 @@ ls ~/storage/shared/DCIM
 
 ### 5. Permitir comandos externos
 
-El tile ejecuta comandos dentro de Termux, así que hay que habilitar `allow-external-apps` en `~/.termux/termux.properties`:
+El tile ejecuta comandos dentro de Termux, así que hay que habilitar `allow-external-apps` en `~/.termux/termux.properties`. Por defecto esa opción viene comentada (`# allow-external-apps = true`), así que el comando la descomenta si existe o la agrega si no está:
 
 ```bash
 mkdir -p ~/.termux
-grep -q '^allow-external-apps = true' ~/.termux/termux.properties 2>/dev/null || \
+touch ~/.termux/termux.properties
+sed -i 's/^[[:space:]]*#\{0,1\}[[:space:]]*allow-external-apps[[:space:]]*=.*/allow-external-apps = true/' \
+  ~/.termux/termux.properties
+grep -q '^allow-external-apps[[:space:]]*=[[:space:]]*true' ~/.termux/termux.properties || \
   echo 'allow-external-apps = true' >> ~/.termux/termux.properties
 termux-reload-settings
 ```
