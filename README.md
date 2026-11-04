@@ -57,17 +57,16 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
   ```bash
   ls ~/storage/shared/DCIM
   ```
-- Dependencias en Termux. `scrcpy` está en el repositorio **x11**, que no viene habilitado por defecto:
+- Dependencias en Termux. `scrcpy` está en el repositorio **x11**, que se habilita con el paquete `x11-repo`:
 
   ```bash
-  test -f "$PREFIX/etc/apt/sources.list.d/x11.list" || \
-    echo "deb https://packages.termux.dev/apt/termux-x11 x11 main" \
-    > "$PREFIX/etc/apt/sources.list.d/x11.list"
+  pkg update -y
+  pkg install -y x11-repo
   pkg update -y
   pkg install -y scrcpy ffmpeg android-tools
   ```
 
-  > `termux-change-repo` sirve para elegir un **mirror**, no para habilitar repositorios. El repo x11 se agrega con el archivo de arriba. Si instalaste `scrcpy` desde un `.deb` manual, funciona, pero no recibe actualizaciones; mejor usar `pkg install scrcpy`.
+  > `termux-change-repo` sirve para elegir un **mirror**, no para habilitar repositorios. `x11-repo` es la forma oficial de agregar el repositorio x11. Si instalaste `scrcpy` desde un `.deb` manual, funciona, pero no recibe actualizaciones; mejor usar `pkg install scrcpy`.
 
 - ADB disponible por TCP (local) para que `scrcpy` pueda capturar la pantalla:
   - Verificar con `adb devices`.
@@ -105,9 +104,7 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
    ```bash
    pkg update -y && pkg upgrade -y
    # opcional: elegir un mirror con termux-change-repo
-   test -f "$PREFIX/etc/apt/sources.list.d/x11.list" || \
-     echo "deb https://packages.termux.dev/apt/termux-x11 x11 main" \
-     > "$PREFIX/etc/apt/sources.list.d/x11.list"
+   pkg install -y x11-repo
    pkg update -y
    pkg install -y scrcpy ffmpeg android-tools
    termux-setup-storage     # aceptar el permiso de almacenamiento
