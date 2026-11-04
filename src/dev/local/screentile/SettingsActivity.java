@@ -2,10 +2,14 @@ package dev.local.screentile;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.Insets;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -121,6 +125,57 @@ public class SettingsActivity extends Activity {
         });
 
         setContentView(scroll);
+        applyInsets(scroll, pad);
+        setLightSystemBars();
+    }
+
+    /** Evita que el contenido quede debajo de la status bar y la barra de navegacion
+     * cuando Android fuerza edge-to-edge (targetSdk 35+). */
+    private void applyInsets(final View view, final int basePad) {
+        view.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+            @Override public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                int left, top, right, bottom;
+                if (Build.VERSION.SDK_INT >= 30) {
+                    Insets bars = insets.getInsets(
+                            WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+                    left = bars.left;
+                    top = bars.top;
+                    right = bars.right;
+                    bottom = bars.bottom;
+                } else {
+                    left = insets.getSystemWindowInsetLeft();
+                    top = insets.getSystemWindowInsetTop();
+                    right = insets.getSystemWindowInsetRight();
+                    bottom = insets.getSystemWindowInsetBottom();
+                }
+                v.setPadding(basePad + left, basePad + top,
+                        basePad + right, basePad + bottom);
+                return insets;
+            }
+        });
+        view.requestApplyInsets();
+    }
+
+    private void setLightSystemBars() {
+        getWindow().setStatusBarColor(Color.WHITE);
+        if (Build.VERSION.SDK_INT >= 26) {
+            getWindow().setNavigationBarColor(Color.WHITE);
+        }
+        View decor = getWindow().getDecorView();
+        if (Build.VERSION.SDK_INT >= 30) {
+            WindowInsetsController c = decor.getWindowInsetsController();
+            if (c != null) {
+                int mask = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                        | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                c.setSystemBarsAppearance(mask, mask);
+            }
+        } else {
+            int flags = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            if (Build.VERSION.SDK_INT >= 26) {
+                flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            }
+            decor.setSystemUiVisibility(flags);
+        }
     }
 
     private void addSection(LinearLayout root, String label, RadioGroup rg) {
