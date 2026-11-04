@@ -2,7 +2,9 @@
 
 Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que permite grabar la pantalla del mismo dispositivo sin root. El tile es un control remoto: dispara `~/bin/screenrec.sh`, que corre `scrcpy` conectado por TCP a `127.0.0.1:5555` (o al puerto detectado por el sistema).
 
-## Qué incluye el repositorio
+## Por qué existe este proyecto
+
+El grabador de pantalla integrado en MIUI/HyperOS (Xiaomi/POCO) puede tener limitaciones: resolución/FPS máximos, calidad, duración, marca de agua, o no deja ajustar bitrate/codec. Este proyecto usa **scrcpy** para grabar con mayor calidad y control (resolución, FPS, codec, bitrate, audio), mientras el tile solo actúa como control remoto.
 
 - `~/bin/screenrec.sh` — grabación con `scrcpy`, conversión MKV → MP4 y aviso al MediaStore.
 - `dev.local.screentile` (`screenrec-tile.apk`) — tile en el Centro de control + app de configuración.
