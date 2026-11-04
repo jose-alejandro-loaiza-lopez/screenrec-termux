@@ -27,6 +27,7 @@ El grabador de pantalla integrado en MIUI/HyperOS (Xiaomi/POCO) puede tener limi
   - Codec: H.264 (por defecto) / H.265 (HEVC)
   - Bitrate de video: 0–100 Mbps (0 = automático por scrcpy)
   - Fuente de audio: interno (por defecto) / micrófono / interno + micrófono / sin audio
+  - Prioridad del proceso: muy alta / alta / normal / baja / muy baja
   - Bitrate de audio: 128 / 256 / 320 kbps
 - Grabación en `.mkv`, conversión automática a `.mp4` (H.264/H.265 + AAC) y borrado del `.mkv`.
 - Con audio interno, el sonido sigue saliendo por el teléfono (`--audio-dup`).
@@ -261,14 +262,14 @@ pkg install -y git openjdk-17 d8 aapt2 apksigner
 Parámetros por entorno o argumentos:
 
 ```bash
-MAX_SIZE=2400 MAX_FPS=60 VCODEC=h264 BITRATE=0 ABITRATE=128K ASOURCE=playback \
+MAX_SIZE=2400 MAX_FPS=60 VCODEC=h264 BITRATE=0 ABITRATE=128K ASOURCE=playback PRIORITY=high \
   ~/bin/screenrec.sh start
 ```
 
 También se pueden pasar posicionalmente:
 
 ```bash
-~/bin/screenrec.sh start <max-size> <fps> <codec> <video-mbps> <audio-kbps> <audio-source>
+~/bin/screenrec.sh start <max-size> <fps> <codec> <video-mbps> <audio-kbps> <audio-source> <priority>
 ```
 
 Valores de `<audio-source>`:
@@ -279,6 +280,16 @@ Valores de `<audio-source>`:
 | `mic` | Micrófono |
 | `both` | Interno + micrófono (`voice-performance`) |
 | `none` | Sin audio |
+
+Valores de `<priority>` (renice):
+
+| Valor | Nice |
+|---|---:|
+| `very_high` | -10 |
+| `high` | -5 (por defecto) |
+| `normal` | 0 |
+| `low` | 5 |
+| `very_low` | 10 |
 
 Notas de audio:
 

@@ -21,9 +21,23 @@ fi
 APP="dev.local.screentile"
 MEDIA_STREAM=3
 
-# Intentar prioridad alta para la grabacion. En Termux esto suele funcionar
-# aunque no se sea root, porque el limite RLIMIT_NICE lo permite.
-renice -n -10 $$ >/dev/null 2>&1 || true
+# Prioridad deseada (env PRIORITY o argumento del tile)
+ARG_PRIORITY="${8:-}"
+PRIORITY="${PRIORITY:-high}"
+[ -n "${ARG_PRIORITY:-}" ] && PRIORITY="$ARG_PRIORITY"
+NICE=-10
+case "$PRIORITY" in
+    very_high|muy_alta) NICE=-10 ;;
+    high|alta)          NICE=-5 ;;
+    normal)             NICE=0 ;;
+    low|baja)           NICE=5 ;;
+    very_low|muy_baja)  NICE=10 ;;
+    -10|-5|0|5|10)     NICE="$PRIORITY" ;;
+    *)                  PRIORITY=high; NICE=-10 ;;
+esac
+
+# Intentar aplicar la prioridad. Si falla, la grabacion sigue.
+renice -n "$NICE" $$ >/dev/null 2>&1 || true
 
 # ajustes opcionales pasados por el tile (max-size, fps, codec)
 ARG_SIZE="${2:-}"
