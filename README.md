@@ -5,7 +5,6 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 ## Qué incluye el repositorio
 
 - `~/bin/screenrec.sh` — grabación con `scrcpy`, conversión MKV → MP4 y aviso al MediaStore.
-- `~/bin/qs-tap.sh` — helper para abrir el panel y tocar un tile por `content-desc`.
 - `dev.local.screentile` (`screenrec-tile.apk`) — tile en el Centro de control + app de configuración.
 - Fuentes Java en `src/dev/local/screentile/`.
 - `build.sh` / `install.sh` — compilación, firma e instalación automatizadas (install.sh también copia `scripts/` a `~/bin`).
@@ -176,5 +175,4 @@ También se pueden pasar posicionalmente:
 | `CollapseActivity.java` | actividad vacía para colapsar el panel |
 | `AndroidManifest.xml` | servicio tile + receiver + activity |
 | `~/bin/screenrec.sh` | ADB, scrcpy, conversión MKV→MP4, MediaStore |
-| `~/bin/qs-tap.sh` | helper de prueba |
 | `build.sh` / `install.sh` | build, firma e instalación |
