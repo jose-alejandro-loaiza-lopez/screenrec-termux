@@ -41,6 +41,8 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 ## Requisitos
 
 - Android 7+
+- **Termux instalado desde F-Droid**: <https://f-droid.org/packages/com.termux/>
+  (la versión de Play Store está desactualizada y puede fallar con `RUN_COMMAND`).
 - Termux instalado y actualizado (`pkg upgrade`)
 - Termux con **acceso externo habilitado**: en `~/.termux/termux.properties` escribir
   `allow-external-apps = true` y reiniciar Termux.
@@ -84,6 +86,8 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 - El tile necesita permiso `com.termux.permission.RUN_COMMAND` (otorgado por `install.sh`).
 
 ## Instalación paso a paso
+
+> Antes de empezar, instala Termux desde F-Droid: <https://f-droid.org/packages/com.termux/>
 
 1. Prepara Termux (dependencias y PATH):
 
