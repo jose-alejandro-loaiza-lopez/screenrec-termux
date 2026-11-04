@@ -285,8 +285,8 @@ Valores de `<priority>` (renice):
 
 | Valor | Nice |
 |---|---:|
-| `very_high` | -10 |
-| `high` | -5 (por defecto) |
+| `very_high` | -10 (por defecto) |
+| `high` | -5 |
 | `normal` | 0 |
 | `low` | 5 |
 | `very_low` | 10 |

@@ -14,6 +14,7 @@ public final class Config {
     public static final String KEY_BITRATE = "bitrate"; // 0..100 (0 = automatico)
     public static final String KEY_ABITRATE = "abitrate"; // 128 | 256 | 320
     public static final String KEY_ASOURCE = "asource"; // playback | mic | both | none
+    public static final String KEY_PRIORITY = "priority"; // very_high | high | normal | low | very_low
 
     private Config() {}
 
@@ -27,6 +28,7 @@ public final class Config {
     public static int    bitrate(Context c){ return sp(c).getInt(KEY_BITRATE,   0); }
     public static int    abitrate(Context c){ return sp(c).getInt(KEY_ABITRATE, 128); }
     public static String asource(Context c) { return sp(c).getString(KEY_ASOURCE, "playback"); }
+    public static String priority(Context c) { return sp(c).getString(KEY_PRIORITY, "very_high"); }
 
     /** max-size que scrcpy debe usar, calculado segun las dimensiones reales
      * de la pantalla y el preset (la dimension corta del target). */
@@ -69,7 +71,7 @@ public final class Config {
     }
 
     public static void save(Context c, String res, String fps, String codec,
-                            int bitrate, int abitrate, String asource) {
+                            int bitrate, int abitrate, String asource, String priority) {
         sp(c).edit()
             .putString(KEY_RES, res)
             .putString(KEY_FPS, fps)
@@ -77,6 +79,7 @@ public final class Config {
             .putInt(KEY_BITRATE, bitrate)
             .putInt(KEY_ABITRATE, abitrate)
             .putString(KEY_ASOURCE, asource)
+            .putString(KEY_PRIORITY, priority)
             .apply();
     }
 }

@@ -18,7 +18,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 public class SettingsActivity extends Activity {
-    private RadioGroup rgRes, rgFps, rgCodec, rgAudio, rgASource;
+    private RadioGroup rgRes, rgFps, rgCodec, rgAudio, rgASource, rgPriority;
     private SeekBar sbBitrate;
     private TextView tvBitrate;
 
@@ -72,6 +72,14 @@ public class SettingsActivity extends Activity {
         addOption(rgASource, "Interno + micrófono", "both");
         addOption(rgASource, "Sin audio", "none");
 
+        rgPriority = new RadioGroup(this);
+        addSection(root, "Prioridad del proceso", rgPriority);
+        addOption(rgPriority, "Muy alta (recomendado)", "very_high");
+        addOption(rgPriority, "Alta", "high");
+        addOption(rgPriority, "Normal", "normal");
+        addOption(rgPriority, "Baja", "low");
+        addOption(rgPriority, "Muy baja", "very_low");
+
         rgAudio = new RadioGroup(this);
         addSection(root, "Bitrate de audio (kbps)", rgAudio);
         addOption(rgAudio, "128 kbps", "128");
@@ -100,6 +108,7 @@ public class SettingsActivity extends Activity {
         check(rgFps,   Config.fps(this));
         check(rgCodec, Config.codec(this));
         check(rgASource, Config.asource(this));
+        check(rgPriority, Config.priority(this));
         check(rgAudio, String.valueOf(Config.abitrate(this)));
         sbBitrate.setProgress(Config.bitrate(this));
         updateBitrateLabel(sbBitrate.getProgress());
@@ -113,6 +122,7 @@ public class SettingsActivity extends Activity {
         rgFps.setOnCheckedChangeListener(saver);
         rgCodec.setOnCheckedChangeListener(saver);
         rgASource.setOnCheckedChangeListener(saver);
+        rgPriority.setOnCheckedChangeListener(saver);
         rgAudio.setOnCheckedChangeListener(saver);
 
         sbBitrate.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -229,11 +239,13 @@ public class SettingsActivity extends Activity {
         String c = selected(rgCodec);
         String a = selected(rgAudio);
         String src = selected(rgASource);
+        String pr = selected(rgPriority);
         if (r != null && f != null && c != null) {
             int ab = 128;
             try { if (a != null) ab = Integer.parseInt(a); } catch (Exception ignored) {}
             if (src == null) src = "playback";
-            Config.save(this, r, f, c, sbBitrate.getProgress(), ab, src);
+            if (pr == null) pr = "very_high";
+            Config.save(this, r, f, c, sbBitrate.getProgress(), ab, src, pr);
         }
     }
 

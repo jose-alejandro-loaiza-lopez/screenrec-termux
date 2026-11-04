@@ -23,7 +23,7 @@ MEDIA_STREAM=3
 
 # Prioridad deseada (env PRIORITY o argumento del tile)
 ARG_PRIORITY="${8:-}"
-PRIORITY="${PRIORITY:-high}"
+PRIORITY="${PRIORITY:-very_high}"
 [ -n "${ARG_PRIORITY:-}" ] && PRIORITY="$ARG_PRIORITY"
 NICE=-10
 case "$PRIORITY" in
@@ -33,7 +33,7 @@ case "$PRIORITY" in
     low|baja)           NICE=5 ;;
     very_low|muy_baja)  NICE=10 ;;
     -10|-5|0|5|10)     NICE="$PRIORITY" ;;
-    *)                  PRIORITY=high; NICE=-10 ;;
+     *)                  PRIORITY=very_high; NICE=-10 ;;
 esac
 
 # Intentar aplicar la prioridad. Si falla, la grabacion sigue.
