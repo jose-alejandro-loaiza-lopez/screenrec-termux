@@ -20,6 +20,7 @@ El grabador de pantalla integrado en MIUI/HyperOS (Xiaomi/POCO) puede tener limi
 - Tile **Grabar pantalla / Grabando pantalla** en el Centro de control.
 - Al tocar: alterna grabar/detener, muestra el cambio al instante y cierra el panel automáticamente.
 - Long-press del tile: abre **Configurar grabación** (vía `QS_TILE_PREFERENCES`).
+- Se ejecuta con alta prioridad: `screenrec.sh` intenta `renice -n -10` al inicio; en Termux normalmente funciona incluso sin root.
 - App de configuración para elegir:
   - Resolución: 720p / 1080p / 1440p / 4K
   - FPS: 30 / 60 (por defecto) / 90 / 120
@@ -320,7 +321,7 @@ Pruebas realizadas en el mismo escenario: gameplay de **Sonolus** (juego gráfic
 
 - La resolución de salida se calcula con las dimensiones reales del display, por lo que se adapta a pantallas anchas, estrechas o de distintas relaciones de aspecto.
 - En MIUI/HyperOS el long-press del tile puede abrir el editor de tiles en lugar de Configurar grabación; el icono de app sigue funcionando.
-- Para máxima estabilidad, `screenrec.sh` intenta subir su prioridad con `renice -n -10` al inicio; en Termux normalmente funciona incluso sin root. Conviene dejar Termux abierto o en aplicaciones recientes para asegurar que la prioridad se mantenga. Si Termux está cerrado, el proceso puede iniciar con nice 0.
+- Para máxima estabilidad, `screenrec.sh` intenta subir su prioridad con `renice -n -10` al inicio; en Termux normalmente funciona incluso sin root. Si falla por permisos, la grabación continúa con la prioridad heredada.
 - El build no depende de Android Studio ni Gradle; usa `javac`, `d8`, `aapt2` y `apksigner`. `build.sh` genera un `ks.jks` de desarrollo si no existe.
 
 ## Archivos fuente principales
