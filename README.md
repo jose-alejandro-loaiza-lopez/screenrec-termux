@@ -8,7 +8,7 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 - `dev.local.screentile` (`screenrec-tile.apk`) — tile en el Centro de control + app de configuración.
 - Fuentes Java en `src/dev/local/screentile/`.
 - `build.sh` / `install.sh` — compilación, firma e instalación automatizadas (install.sh también copia `scripts/` a `~/bin`).
-- `scripts/screenrec.sh`, `scripts/qs-tap.sh` — scripts de Termux versionados en el repo.
+- `scripts/screenrec.sh` — script de Termux versionado en el repo.
 - `AndroidManifest.xml` — servicio tile, receiver y activity.
 - `README.md`.
 
@@ -38,90 +38,133 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 5. Convierte el `.mkv` a `.mp4` con `ffmpeg` (`-c:v copy`, audio AAC, `+faststart`, tag `hvc1` en H.265).
 6. Notifica al MediaStore y envía broadcast `dev.local.screentile.STATE` para actualizar el tile.
 
-## Requisitos
+## Requisitos y preparación del entorno
 
-- Android 7+
-- **Termux instalado desde F-Droid**: <https://f-droid.org/packages/com.termux/>
-  (la versión de Play Store está desactualizada y puede fallar con `RUN_COMMAND`).
-- Termux instalado y actualizado (`pkg update -y && pkg upgrade -y`)
-- Termux con **acceso externo habilitado**: en `~/.termux/termux.properties` escribir
-  `allow-external-apps = true` y reiniciar Termux.
-- Permiso de almacenamiento de Termux (necesario para escribir en `/sdcard/DCIM/ScreenRecorder`):
+> **Completa toda esta sección antes de empezar la instalación paso a paso.**
+> La instalación asume que Termux, las dependencias, el acceso al almacenamiento y ADB ya están listos.
 
-  ```bash
-  termux-setup-storage
-  ```
+### 1. Instalar Termux desde F-Droid
 
-  Acepta el diálogo de Android. Verifica con:
+- Android 7 o superior.
+- Instala Termux desde F-Droid: <https://f-droid.org/packages/com.termux/>
+- No uses la versión de Play Store: está desactualizada y puede fallar con `RUN_COMMAND`.
 
-  ```bash
-  ls ~/storage/shared/DCIM
-  ```
-- Dependencias en Termux. `scrcpy` está en el repositorio **x11**, que se habilita con el paquete `x11-repo`:
+Abre Termux y actualiza todos los paquetes:
 
-  ```bash
-  pkg update -y
-  pkg install -y x11-repo
-  pkg update -y
-  pkg install -y scrcpy ffmpeg android-tools
-  ```
+```bash
+pkg update -y && pkg upgrade -y
+```
 
-  > `termux-change-repo` sirve para elegir un **mirror**, no para habilitar repositorios. `x11-repo` es la forma oficial de agregar el repositorio x11. Si instalaste `scrcpy` desde un `.deb` manual, funciona, pero no recibe actualizaciones; mejor usar `pkg install scrcpy`.
+### 2. Habilitar el repositorio x11
 
-- ADB disponible por TCP (local) para que `scrcpy` pueda capturar la pantalla:
-  - Verificar con `adb devices`.
-  - Si no aparece `127.0.0.1:5555 device`, habilitar ADB por TCP con alguno de estos métodos:
+`scrcpy` está en el repositorio **x11**, que se habilita con el paquete `x11-repo`:
 
-    **Método A (si el ROM ya lo expone, como muchos MIUI/Xiaomi):**
-    no hace falta hacer nada.
+```bash
+pkg install -y x11-repo
+pkg update -y
+```
 
-    **Método B (con root, desde Termux):**
-    ```bash
-    tsu -c "setprop service.adb.tcp.port 5555; stop adbd; start adbd"
-    ```
+> `termux-change-repo` solo cambia el mirror; no habilita repositorios.
 
-    **Método C (desde USB/ADB en una PC):**
-    ```bash
-    adb devices
-    adb tcpip 5555
-    adb connect 127.0.0.1:5555
-    ```
+### 3. Instalar dependencias
 
-    **Método D (Android 11+ emparejamiento inalámbrico):**
-    usar `adb pair` y `adb connect`, luego exportar `SERIAL` con el puerto asignado:
-    ```bash
-    SERIAL=127.0.0.1:<puerto> ~/bin/screenrec.sh start
-    ```
-  - Si tu dispositivo usa un puerto distinto de 5555, redefine `SERIAL` por entorno.
-- El tile necesita permiso `com.termux.permission.RUN_COMMAND` (otorgado por `install.sh`).
+```bash
+pkg install -y scrcpy ffmpeg android-tools git \
+  openjdk-17 d8 aapt2 apksigner
+```
+
+Verifica que estén disponibles:
+
+```bash
+pkg show scrcpy
+command -v javac d8 aapt2 apksigner git adb ffmpeg
+```
+
+> Si `scrcpy` no aparece, revisa que `x11-repo` se haya instalado y ejecuta `pkg update -y` otra vez.
+
+### 4. Dar acceso al almacenamiento
+
+Necesario para escribir en `/sdcard/DCIM/ScreenRecorder`:
+
+```bash
+termux-setup-storage
+```
+
+Acepta el diálogo de Android y verifica:
+
+```bash
+ls ~/storage/shared/DCIM
+```
+
+### 5. Permitir comandos externos
+
+El tile ejecuta comandos dentro de Termux, así que hay que habilitar `allow-external-apps` en `~/.termux/termux.properties`:
+
+```bash
+mkdir -p ~/.termux
+grep -q '^allow-external-apps = true' ~/.termux/termux.properties 2>/dev/null || \
+  echo 'allow-external-apps = true' >> ~/.termux/termux.properties
+termux-reload-settings
+```
+
+### 6. Preparar ADB por TCP
+
+`scrcpy` necesita ADB local. Comprueba primero:
+
+```bash
+adb connect 127.0.0.1:5555 >/dev/null 2>&1 || true
+adb devices
+```
+
+Debe aparecer `127.0.0.1:5555    device`. Si no aparece, usa uno de estos métodos:
+
+**Método A (el ROM ya expone ADB por TCP, como muchos MIUI/Xiaomi):**
+no hace falta hacer nada más.
+
+**Método B (con root, desde Termux):**
+
+```bash
+tsu -c "setprop service.adb.tcp.port 5555; stop adbd; start adbd"
+```
+
+**Método C (desde una PC con USB):**
+
+```bash
+# con el teléfono conectado por USB y depuración USB activa
+adb devices
+adb tcpip 5555
+```
+
+Desconecta el USB y, en Termux del teléfono:
+
+```bash
+adb connect 127.0.0.1:5555
+adb devices
+```
+
+**Método D (emparejamiento inalámbrico de Android 11+):**
+
+```bash
+adb pair 127.0.0.1:<puerto-de-emparejamiento>
+adb connect 127.0.0.1:<puerto-de-conexion>
+```
+
+> Si el puerto no es 5555, el script intenta leer `service.adb.tcp.port`; también puedes forzarlo con `SERIAL=127.0.0.1:PUERTO`.
+
+El permiso `com.termux.permission.RUN_COMMAND` no se concede a mano: lo otorga `install.sh` durante la instalación.
 
 ## Instalación paso a paso
 
-> Antes de empezar, instala Termux desde F-Droid: <https://f-droid.org/packages/com.termux/>
+> **Antes de empezar:** completa la sección **Requisitos y preparación del entorno**. La instalación no repite esos comandos; solo asume que ya están hechos.
 
-1. Prepara Termux (actualiza todo, dependencias y PATH):
-
-   ```bash
-   pkg update -y && pkg upgrade -y
-   # opcional: elegir un mirror con termux-change-repo
-   pkg install -y x11-repo
-   pkg update -y
-   pkg install -y scrcpy ffmpeg android-tools
-   termux-setup-storage     # aceptar el permiso de almacenamiento
-   mkdir -p ~/bin
-   grep -q 'export PATH="$HOME/bin:$PATH"' ~/.bashrc || \
-       echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
-   source ~/.bashrc
-   ```
-
-2. Clona/copiá el proyecto:
+1. Clona el proyecto:
 
    ```bash
    git clone https://github.com/jose-alejandro-loaiza-lopez/screenrec-termux.git ~/projects/screenrec
    cd ~/projects/screenrec
    ```
 
-3. Compila y firma:
+2. Compila y firma:
 
    ```bash
    ./build.sh
@@ -129,15 +172,17 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 
    (Si falta `ks.jks`, `build.sh` lo genera con clave de desarrollo.)
 
-4. Instala y concede permiso:
+3. Instala y concede el permiso `RUN_COMMAND`:
 
    ```bash
    ./install.sh
    ```
 
-5. Agrega el tile **Grabar pantalla** al Centro de control (editor de tiles, si no aparece solo).
+   `install.sh` también copia `screenrec.sh` a `~/bin` y agrega esa carpeta al `PATH`.
 
-6. Prueba:
+4. Agrega el tile **Grabar pantalla** al Centro de control (editor de tiles, si no aparece solo).
+
+5. Prueba:
 
    ```bash
    ~/bin/screenrec.sh start
@@ -146,7 +191,7 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
    ls -lh /sdcard/DCIM/ScreenRecorder
    ```
 
-Rebuild / reinstall manual:
+### Rebuild (solo si modificas el código)
 
 ```bash
 cd ~/projects/screenrec
