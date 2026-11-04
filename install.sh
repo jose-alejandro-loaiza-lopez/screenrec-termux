@@ -10,9 +10,6 @@ export PATH="$PREFIX/bin:$PATH"
 if [ -d scripts ] && [ -f scripts/screenrec.sh ]; then
     mkdir -p "$HOME/bin"
     install -m 0755 scripts/screenrec.sh "$HOME/bin/screenrec.sh"
-    if [ -f scripts/qs-tap.sh ]; then
-        install -m 0755 scripts/qs-tap.sh "$HOME/bin/qs-tap.sh"
-    fi
 fi
 
 # asegurar que ~/bin este en PATH (idempotente)
