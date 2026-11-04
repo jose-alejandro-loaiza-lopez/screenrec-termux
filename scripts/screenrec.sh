@@ -21,6 +21,10 @@ fi
 APP="dev.local.screentile"
 MEDIA_STREAM=3
 
+# Intentar prioridad alta para la grabacion. En Termux esto suele funcionar
+# aunque no se sea root, porque el limite RLIMIT_NICE lo permite.
+renice -n -10 $$ >/dev/null 2>&1 || true
+
 # ajustes opcionales pasados por el tile (max-size, fps, codec)
 ARG_SIZE="${2:-}"
 ARG_FPS="${3:-}"
