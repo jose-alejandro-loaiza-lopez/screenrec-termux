@@ -46,6 +46,16 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
   `allow-external-apps = true` y reiniciar Termux.
 - Dependencias en Termux:
 
+  `scrcpy` está en el repositorio **x11**. Si no lo tienes habilitado:
+
+  ```bash
+  termux-change-repo
+  # activa el repo 'x11' (y deja 'main' habilitado)
+  pkg update
+  ```
+
+  Luego:
+
   ```bash
   pkg install scrcpy ffmpeg android-tools
   ```
@@ -82,6 +92,8 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 1. Prepara Termux (dependencias y PATH):
 
    ```bash
+   termux-change-repo          # habilita el repo x11 (scrcpy vive ahí)
+   pkg update
    pkg install scrcpy ffmpeg android-tools
    mkdir -p ~/bin
    grep -q 'export PATH="$HOME/bin:$PATH"' ~/.bashrc || \
