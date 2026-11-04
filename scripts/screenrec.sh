@@ -173,7 +173,7 @@ start_rec() {
     # setsid: desacopla scrcpy de la sesion de Termux para que no lo maten
     # cuando el comando lanzado por el tile termina
     setsid "${PREFIX}/bin/bash" -c 'echo $$ >"$PIDFILE"; exec scrcpy "$@"' _ \
-        -s "$SERIAL" -N \
+        -s "$SERIAL" -N --no-window \
         --record="$file" \
         --max-size="$MAX_SIZE" \
         --min-size-alignment=8 \

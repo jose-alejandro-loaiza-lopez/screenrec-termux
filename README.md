@@ -334,6 +334,7 @@ Pruebas realizadas en el mismo escenario: gameplay de **Sonolus** (juego gráfic
 - La resolución de salida se calcula con las dimensiones reales del display, por lo que se adapta a pantallas anchas, estrechas o de distintas relaciones de aspecto.
 - En MIUI/HyperOS el long-press del tile puede abrir el editor de tiles en lugar de Configurar grabación; el icono de app sigue funcionando.
 - Para máxima estabilidad, `screenrec.sh` intenta subir su prioridad con `renice -n -10` al inicio; en Termux normalmente funciona incluso sin root. Si falla por permisos, la grabación continúa con la prioridad heredada.
+- El script usa `--no-window` y `--no-playback` para evitar crear ventana/GUI innecesaria durante la captura y reducir overhead.
 - El build no depende de Android Studio ni Gradle; usa `javac`, `d8`, `aapt2` y `apksigner`. `build.sh` genera un `ks.jks` de desarrollo si no existe.
 
 ## Archivos fuente principales
