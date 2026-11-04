@@ -4,7 +4,7 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 
 ## Por qué existe este proyecto
 
-El grabador de pantalla integrado en MIUI/HyperOS (Xiaomi/POCO) puede tener limitaciones: resolución/FPS máximos, calidad, duración, marca de agua, o no deja ajustar bitrate/codec. Este proyecto usa **scrcpy** para grabar con mayor calidad y control (resolución, FPS, codec, bitrate, audio), mientras el tile solo actúa como control remoto.
+El grabador de pantalla integrado en MIUI/HyperOS (Xiaomi/POCO) puede tener limitaciones. Este proyecto ofrece una mayor calidad, control y rendimiento usando **scrcpy**, mientras el tile solo actúa como control remoto.
 
 - `~/bin/screenrec.sh` — grabación con `scrcpy`, conversión MKV → MP4 y aviso al MediaStore.
 - `dev.local.screentile` (`screenrec-tile.apk`) — tile en el Centro de control + app de configuración.
