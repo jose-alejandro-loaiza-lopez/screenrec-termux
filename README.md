@@ -9,6 +9,7 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 - Fuentes Java en `src/dev/local/screentile/`.
 - `build.sh` / `install.sh` — compilación, firma e instalación automatizadas (install.sh también copia `scripts/` a `~/bin`).
 - `scripts/screenrec.sh` — script de Termux versionado en el repo.
+- `scripts/screenrec-cleanup.sh` — limpia las herramientas de compilación después de instalar.
 - `AndroidManifest.xml` — servicio tile, receiver y activity.
 - `README.md`.
 
@@ -215,6 +216,31 @@ cd ~/projects/screenrec
 ./build.sh
 adb -s 127.0.0.1:5555 install -r screenrec-tile.apk
 adb -s 127.0.0.1:5555 shell pm grant dev.local.screentile com.termux.permission.RUN_COMMAND
+```
+
+## Liberar espacio después de instalar
+
+Una vez compilada e instalada la app, las herramientas de compilación (git, JDK, d8, aapt2, apksigner) ya no son necesarias para usarla.
+
+`install.sh` deja disponible el comando:
+
+```bash
+# ver qué eliminaría, sin tocar nada
+~/bin/screenrec-cleanup --dry-run
+
+# eliminar, pidiendo confirmación
+~/bin/screenrec-cleanup
+
+# eliminar sin preguntar
+~/bin/screenrec-cleanup --yes
+```
+
+El comando elimina esas herramientas, dependencias huérfanas (`pkg autoremove`) y la cache de paquetes (`pkg clean`). Conserva `scrcpy`, `ffmpeg`, `android-tools` y `x11-repo`.
+
+Si más tarde modifies el código y quieres recompilar, reinstala las dependencias de compilación:
+
+```bash
+pkg install -y git openjdk-17 d8 aapt2 apksigner
 ```
 
 ## Uso desde CLI

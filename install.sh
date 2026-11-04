@@ -16,6 +16,9 @@ fi
 if [ -d scripts ] && [ -f scripts/screenrec.sh ]; then
     mkdir -p "$HOME/bin"
     install -m 0755 scripts/screenrec.sh "$HOME/bin/screenrec.sh"
+    if [ -f scripts/screenrec-cleanup.sh ]; then
+        install -m 0755 scripts/screenrec-cleanup.sh "$HOME/bin/screenrec-cleanup"
+    fi
 fi
 
 # asegurar que ~/bin este en PATH (idempotente)
