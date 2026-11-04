@@ -291,6 +291,31 @@ Notas de audio:
 - Si `SERIAL` no está definido, el script usa el sistema: `service.adb.tcp.port`.
 - Si adbd no está en TCP y el usuario es root, intenta habilitar 5555 automáticamente.
 
+## Comparativa de pruebas (grabador de Xiaomi vs scrcpy)
+
+Pruebas realizadas en el mismo escenario: gameplay de **Sonolus** (juego gráficamente ligero), para que la diferencia de rendimiento no dependa del juego.
+
+### Resultados
+
+| Grabación | Origen / ajuste | Resolución | FPS promedio | Codec | Bitrate video | Audio | Duración | Tamaño | MB/s | Bits/píxel/frame |
+|---|---|---:|---:|---|---:|---|---:|---:|---:|---:|
+| Xiaomi nativa | Grabador Xiaomi | 2712×1220 | ~88 | HEVC | ~43.9 Mbps | AAC mono, 44.1 kHz | 117.9 s | 620 MB | ~5.26 | ~0.151 |
+| scrcpy 1080p | scrcpy 1080p | 2400×1080 | ~117 | H.264 | ~38.6 Mbps | AAC estéreo, 48 kHz | 126.2 s | 583 MB | ~4.62 | ~0.126 |
+| scrcpy 4K H.264 | scrcpy 4K nativo | 2712×1216 | ~117 | H.264 | ~51.0 Mbps | AAC estéreo, 48 kHz | 144.7 s | 884 MB | ~6.11 | ~0.132 |
+| scrcpy 4K HEVC | scrcpy 4K nativo | 2712×1216 | ~117 | HEVC | ~63.9 Mbps | AAC estéreo, 48 kHz | 138.0 s | 1.03 GB | ~7.66 | ~0.166 |
+
+### Conclusiones
+
+- El grabador de Xiaomi solo permitía hasta **90 fps**, y en la práctica quedó en **~88 fps**.
+- scrcpy mantuvo **~117 fps estables** en 1080p y en 4K nativo.
+- Con el grabador de Xiaomi el juego se sentía lagado, con tirones y fps bajos durante la grabación.
+- Con scrcpy el juego se sentía como si no se estuviera grabando: 120 fps estables y sin tirones.
+- La grabación nativa de Xiaomi usó HEVC con ~0.151 bits/píxel, mientras scrcpy 4K HEVC llegó a ~0.166 bits/píxel.
+- La mejor combinación de calidad y fluidez fue **4K / 120 fps / H.265 / ~64 Mbps**.
+- La opción más liviana fue **1080p / 120 fps / H.264 / ~39 Mbps**.
+
+> Nota: Sonolus es un juego gráficamente ligero, por lo que la diferencia de rendimiento se debe principalmente al grabador, no a la carga del juego.
+
 ## Compatibilidad y otros dispositivos
 
 - La resolución de salida se calcula con las dimensiones reales del display, por lo que se adapta a pantallas anchas, estrechas o de distintas relaciones de aspecto.
