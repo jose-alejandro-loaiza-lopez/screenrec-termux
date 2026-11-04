@@ -43,7 +43,7 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 - Android 7+
 - **Termux instalado desde F-Droid**: <https://f-droid.org/packages/com.termux/>
   (la versión de Play Store está desactualizada y puede fallar con `RUN_COMMAND`).
-- Termux instalado y actualizado (`pkg upgrade`)
+- Termux instalado y actualizado (`pkg update -y && pkg upgrade -y`)
 - Termux con **acceso externo habilitado**: en `~/.termux/termux.properties` escribir
   `allow-external-apps = true` y reiniciar Termux.
 - Dependencias en Termux. `scrcpy` está en el repositorio **x11**, que no viene habilitado por defecto:
@@ -52,8 +52,8 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
   test -f "$PREFIX/etc/apt/sources.list.d/x11.list" || \
     echo "deb https://packages.termux.dev/apt/termux-x11 x11 main" \
     > "$PREFIX/etc/apt/sources.list.d/x11.list"
-  pkg update
-  pkg install scrcpy ffmpeg android-tools
+  pkg update -y
+  pkg install -y scrcpy ffmpeg android-tools
   ```
 
   > `termux-change-repo` sirve para elegir un **mirror**, no para habilitar repositorios. El repo x11 se agrega con el archivo de arriba. Si instalaste `scrcpy` desde un `.deb` manual, funciona, pero no recibe actualizaciones; mejor usar `pkg install scrcpy`.
@@ -89,15 +89,16 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 
 > Antes de empezar, instala Termux desde F-Droid: <https://f-droid.org/packages/com.termux/>
 
-1. Prepara Termux (dependencias y PATH):
+1. Prepara Termux (actualiza todo, dependencias y PATH):
 
    ```bash
+   pkg update -y && pkg upgrade -y
    # opcional: elegir un mirror con termux-change-repo
    test -f "$PREFIX/etc/apt/sources.list.d/x11.list" || \
      echo "deb https://packages.termux.dev/apt/termux-x11 x11 main" \
      > "$PREFIX/etc/apt/sources.list.d/x11.list"
-   pkg update
-   pkg install scrcpy ffmpeg android-tools
+   pkg update -y
+   pkg install -y scrcpy ffmpeg android-tools
    mkdir -p ~/bin
    grep -q 'export PATH="$HOME/bin:$PATH"' ~/.bashrc || \
        echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
