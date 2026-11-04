@@ -320,6 +320,7 @@ Pruebas realizadas en el mismo escenario: gameplay de **Sonolus** (juego gráfic
 
 - La resolución de salida se calcula con las dimensiones reales del display, por lo que se adapta a pantallas anchas, estrechas o de distintas relaciones de aspecto.
 - En MIUI/HyperOS el long-press del tile puede abrir el editor de tiles en lugar de Configurar grabación; el icono de app sigue funcionando.
+- Para máxima estabilidad, deja Termux abierto en segundo plano (o en aplicaciones recientes) antes de grabar. Cuando Termux tiene prioridad alta, scrcpy hereda un nice cercano a -10; si Termux está cerrado, puede iniciarse con nice 0 y tener menos prioridad en juegos pesados.
 - El build no depende de Android Studio ni Gradle; usa `javac`, `d8`, `aapt2` y `apksigner`. `build.sh` genera un `ks.jks` de desarrollo si no existe.
 
 ## Archivos fuente principales
