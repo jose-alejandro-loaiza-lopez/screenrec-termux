@@ -222,22 +222,24 @@ adb -s 127.0.0.1:5555 shell pm grant dev.local.screentile com.termux.permission.
 
 Una vez compilada e instalada la app, las herramientas de compilación (git, JDK, d8, aapt2, apksigner) ya no son necesarias para usarla.
 
-`install.sh` deja disponible el comando:
+El comando queda disponible después de `install.sh`:
 
 ```bash
 # ver qué eliminaría, sin tocar nada
-~/bin/screenrec-cleanup --dry-run
+screenrec-cleanup --dry-run
 
 # eliminar, pidiendo confirmación
-~/bin/screenrec-cleanup
+screenrec-cleanup
 
 # eliminar sin preguntar
-~/bin/screenrec-cleanup --yes
+screenrec-cleanup --yes
 ```
 
-El comando elimina esas herramientas, dependencias huérfanas (`pkg autoremove`) y la cache de paquetes (`pkg clean`). Conserva `scrcpy`, `ffmpeg`, `android-tools` y `x11-repo`.
+(Si el comando no se reconoce, ejecuta `source ~/.bashrc` o usa `~/bin/screenrec-cleanup`.)
 
-Si más tarde modifies el código y quieres recompilar, reinstala las dependencias de compilación:
+El comando elimina esas herramientas, dependencias huerfanas y la cache de paquetes de Termux. Conserva `scrcpy`, `ffmpeg`, `android-tools` y `x11-repo`.
+
+Si más tarde modificas el código y quieres recompilar, reinstala las dependencias de compilación:
 
 ```bash
 pkg install -y git openjdk-17 d8 aapt2 apksigner
