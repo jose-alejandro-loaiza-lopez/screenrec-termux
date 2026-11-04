@@ -14,7 +14,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 public class SettingsActivity extends Activity {
-    private RadioGroup rgRes, rgFps, rgCodec, rgAudio;
+    private RadioGroup rgRes, rgFps, rgCodec, rgAudio, rgASource;
     private SeekBar sbBitrate;
     private TextView tvBitrate;
 
@@ -61,8 +61,15 @@ public class SettingsActivity extends Activity {
         addOption(rgCodec, "H.264 (máxima compatibilidad)", "h264");
         addOption(rgCodec, "H.265 / HEVC (menor tamaño)", "h265");
 
+        rgASource = new RadioGroup(this);
+        addSection(root, "Fuente de audio", rgASource);
+        addOption(rgASource, "Audio interno (recomendado)", "playback");
+        addOption(rgASource, "Micrófono", "mic");
+        addOption(rgASource, "Interno + micrófono", "both");
+        addOption(rgASource, "Sin audio", "none");
+
         rgAudio = new RadioGroup(this);
-        addSection(root, "Audio (kbps)", rgAudio);
+        addSection(root, "Bitrate de audio (kbps)", rgAudio);
         addOption(rgAudio, "128 kbps", "128");
         addOption(rgAudio, "256 kbps", "256");
         addOption(rgAudio, "320 kbps", "320");
@@ -88,6 +95,7 @@ public class SettingsActivity extends Activity {
         check(rgRes,   Config.res(this));
         check(rgFps,   Config.fps(this));
         check(rgCodec, Config.codec(this));
+        check(rgASource, Config.asource(this));
         check(rgAudio, String.valueOf(Config.abitrate(this)));
         sbBitrate.setProgress(Config.bitrate(this));
         updateBitrateLabel(sbBitrate.getProgress());
@@ -100,6 +108,7 @@ public class SettingsActivity extends Activity {
         rgRes.setOnCheckedChangeListener(saver);
         rgFps.setOnCheckedChangeListener(saver);
         rgCodec.setOnCheckedChangeListener(saver);
+        rgASource.setOnCheckedChangeListener(saver);
         rgAudio.setOnCheckedChangeListener(saver);
 
         sbBitrate.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -164,10 +173,12 @@ public class SettingsActivity extends Activity {
         String f = selected(rgFps);
         String c = selected(rgCodec);
         String a = selected(rgAudio);
+        String src = selected(rgASource);
         if (r != null && f != null && c != null) {
             int ab = 128;
             try { if (a != null) ab = Integer.parseInt(a); } catch (Exception ignored) {}
-            Config.save(this, r, f, c, sbBitrate.getProgress(), ab);
+            if (src == null) src = "playback";
+            Config.save(this, r, f, c, sbBitrate.getProgress(), ab, src);
         }
     }
 

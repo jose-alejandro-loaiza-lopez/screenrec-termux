@@ -27,6 +27,7 @@ ARG_FPS="${3:-}"
 ARG_CODEC="${4:-}"
 ARG_BITRATE="${5:-}"
 ARG_ABITRATE="${6:-}"
+ARG_ASOURCE="${7:-}"
 
 # parametros (se pueden sobreescribir por entorno)
 MAX_SIZE="${MAX_SIZE:-2400}"     # 2400 -> 1078x2400 (punto dulce del encoder a 120fps)
@@ -94,10 +95,32 @@ start_rec() {
             *) ABITRATE="${ARG_ABITRATE}K" ;;
         esac
     fi
+    if [ -n "${ARG_ASOURCE:-}" ]; then
+        ASOURCE="$ARG_ASOURCE"
+    fi
+    case "$ASOURCE" in
+        playback|mic|both|none) ;;
+        *) ASOURCE=playback ;;
+    esac
 
-    # --audio-dup solo se permite con --audio-source=playback
-    AUDIO_DUP=""
-    [ "$ASOURCE" = "playback" ] && AUDIO_DUP="--audio-dup"
+    # scrcpy solo admite una fuente de audio por sesion.
+    # "both" usa voice-performance (microfono + reproduccion del dispositivo).
+    local -a AUDIO_ARGS=()
+    case "$ASOURCE" in
+        none)
+            AUDIO_ARGS+=(--no-audio)
+            ;;
+        both)
+            AUDIO_ARGS+=(--audio-source=voice-performance --audio-bit-rate="$ABITRATE")
+            ;;
+        mic)
+            AUDIO_ARGS+=(--audio-source=mic --audio-bit-rate="$ABITRATE")
+            ;;
+        *)
+            ASOURCE=playback
+            AUDIO_ARGS+=(--audio-source=playback --audio-dup --audio-bit-rate="$ABITRATE")
+            ;;
+    esac
 
     # resolver bitrate: 0 o vacio = automatico por scrcpy (se omite el flag)
     if [ "${BITRATE:-}" = "0" ]; then
@@ -125,6 +148,8 @@ start_rec() {
     : >"$LOGFILE"
     echo "$file" >"$STATE/file"
     echo "$VCODEC" >"$STATE/vcodec"
+    echo "$ASOURCE" >"$STATE/asource"
+    echo "$ABITRATE" >"$STATE/abitrate"
     export SDL_VIDEODRIVER=dummy
     export PIDFILE
     # setsid: desacopla scrcpy de la sesion de Termux para que no lo maten
@@ -137,9 +162,7 @@ start_rec() {
         --max-fps="$MAX_FPS" \
         --video-codec="$VCODEC" \
         ${BITRATE:+--video-bit-rate=$BITRATE} \
-        --audio-source="$ASOURCE" \
-        $AUDIO_DUP \
-        --audio-bit-rate="$ABITRATE" \
+        "${AUDIO_ARGS[@]}" \
         --no-control \
         >>"$LOGFILE" 2>&1 </dev/null &
 
@@ -171,7 +194,8 @@ stop_rec() {
     notify idle
 
     # convertir el mkv a mp4 y borrar el mkv original
-    local src codec tag tmp dir base dst
+    local src codec tmp dir base dst asource abitrate
+    local -a tag_args=() audio_args=()
     if [ -f "$STATE/file" ]; then
         src=$(cat "$STATE/file" 2>/dev/null)
         if [ -n "$src" ] && [ -f "$src" ]; then
@@ -180,13 +204,15 @@ stop_rec() {
             dst="$dir/$base.mp4"
             tmp="$dir/$base.tmp.mp4"
             codec=$(cat "$STATE/vcodec" 2>/dev/null || echo h265)
-            tag=""
+            asource=$(cat "$STATE/asource" 2>/dev/null || echo playback)
+            abitrate=$(cat "$STATE/abitrate" 2>/dev/null || echo 128K)
             case "$codec" in
-                h265|hevc) tag="-tag:v hvc1" ;;
+                h265|hevc) tag_args=(-tag:v hvc1) ;;
             esac
+            [ "$asource" != "none" ] && audio_args=(-c:a aac -b:a "$abitrate")
             if ffmpeg -y -hide_banner -loglevel error -i "$src" \
-                    -c:v copy -c:a aac -b:a "$ABITRATE" \
-                    $tag -movflags +faststart "$tmp" \
+                    -c:v copy "${audio_args[@]}" \
+                    "${tag_args[@]}" -movflags +faststart "$tmp" \
                     >>"$LOGFILE" 2>&1; then
                 mv -f "$tmp" "$dst"
                 rm -f "$src"

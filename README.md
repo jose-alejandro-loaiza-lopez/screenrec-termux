@@ -22,9 +22,11 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
   - FPS: 30 / 60 (por defecto) / 90 / 120
   - Codec: H.264 (por defecto) / H.265 (HEVC)
   - Bitrate de video: 0–100 Mbps (0 = automático por scrcpy)
-  - Audio: 128 / 256 / 320 kbps
+  - Fuente de audio: interno (por defecto) / micrófono / interno + micrófono / sin audio
+  - Bitrate de audio: 128 / 256 / 320 kbps
 - Grabación en `.mkv`, conversión automática a `.mp4` (H.264/H.265 + AAC) y borrado del `.mkv`.
-- `--audio-dup` para que el audio siga sonando en el teléfono mientras se graba.
+- Con audio interno, el sonido sigue saliendo por el teléfono (`--audio-dup`).
+- La opción **interno + micrófono** usa `voice-performance` de scrcpy.
 - Resolución calculada dinámicamente según las dimensiones reales del display.
 - Aviso al MediaStore para que Galería/Fotos/Telegram detecten el `.mp4`.
 - Sin root ni modificaciones del sistema (todo en `/data`).
@@ -33,9 +35,9 @@ Aplicación Quick Settings (Centro de control) llamada **Grabar pantalla** que p
 
 1. El tile envía `com.termux.RUN_COMMAND` a Termux.
 2. `screenrec.sh` ejecuta `ensure_adb()` (connect a `127.0.0.1:$PORT` o al puerto detectado).
-3. Lanza `scrcpy` con `setsid`, `--max-size`, `--min-size-alignment=8`, `--audio-source=playback`, `--audio-dup`, etc.
+3. Lanza `scrcpy` con `setsid`, `--max-size`, `--min-size-alignment=8` y la fuente de audio elegida (`playback` + `--audio-dup`, `mic`, `voice-performance` o `--no-audio`).
 4. Al detener envía `SIGINT` a scrcpy (flush correcto del archivo).
-5. Convierte el `.mkv` a `.mp4` con `ffmpeg` (`-c:v copy`, audio AAC, `+faststart`, tag `hvc1` en H.265).
+5. Convierte el `.mkv` a `.mp4` con `ffmpeg` (`-c:v copy`, AAC si hay audio, `+faststart`, tag `hvc1` en H.265).
 6. Notifica al MediaStore y envía broadcast `dev.local.screentile.STATE` para actualizar el tile.
 
 ## Requisitos y preparación del entorno
@@ -110,7 +112,16 @@ grep -q '^allow-external-apps[[:space:]]*=[[:space:]]*true' ~/.termux/termux.pro
 termux-reload-settings
 ```
 
-### 6. Preparar ADB por TCP
+### 6. Activar opciones de desarrollador e "Instalar vía USB"
+
+1. Activa las opciones de desarrollador: Ajustes → Acerca del teléfono → toca 7 veces **Número de compilación**.
+2. Entra en Ajustes → Sistema → **Opciones de desarrollador** y activa:
+   - **Depuración USB**.
+   - **Instalar vía USB** (en MIUI/HyperOS puede aparecer como **Instalar vía USB (Ajustes de seguridad)**). Sin esto, `adb install` puede fallar con `INSTALL_FAILED_USER_RESTRICTED`.
+   - **Depuración inalámbrica** solo si vas a usar el método D de abajo.
+3. En MIUI/HyperOS puede pedir iniciar sesión con la cuenta Mi y reiniciar. Acepta y vuelve a comprobar que las tres opciones sigan activas.
+
+### 7. Preparar ADB por TCP
 
 `scrcpy` necesita ADB local. Comprueba primero:
 
@@ -127,6 +138,7 @@ no hace falta hacer nada más.
 **Método B (con root, desde Termux):**
 
 ```bash
+pkg install -y tsu
 tsu -c "setprop service.adb.tcp.port 5555; stop adbd; start adbd"
 ```
 
@@ -183,6 +195,8 @@ El permiso `com.termux.permission.RUN_COMMAND` no se concede a mano: lo otorga `
 
    `install.sh` también copia `screenrec.sh` a `~/bin` y agrega esa carpeta al `PATH`.
 
+   Si falla con `INSTALL_FAILED_USER_RESTRICTED`, activa **Instalar vía USB** en Opciones de desarrollador (ver paso 6 de los requisitos).
+
 4. Agrega el tile **Grabar pantalla** al Centro de control (editor de tiles, si no aparece solo).
 
 5. Prueba:
@@ -215,15 +229,31 @@ adb -s 127.0.0.1:5555 shell pm grant dev.local.screentile com.termux.permission.
 Parámetros por entorno o argumentos:
 
 ```bash
-MAX_SIZE=2400 MAX_FPS=60 VCODEC=h264 BITRATE= BITRATE_AUDIO= ABITRATE=128K \
+MAX_SIZE=2400 MAX_FPS=60 VCODEC=h264 BITRATE=0 ABITRATE=128K ASOURCE=playback \
   ~/bin/screenrec.sh start
 ```
 
 También se pueden pasar posicionalmente:
 
 ```bash
-~/bin/screenrec.sh start <max-size> <fps> <codec> <video-mbps> <audio-kbps>
+~/bin/screenrec.sh start <max-size> <fps> <codec> <video-mbps> <audio-kbps> <audio-source>
 ```
+
+Valores de `<audio-source>`:
+
+| Valor | Fuente |
+|---|---|
+| `playback` | Audio interno, por defecto |
+| `mic` | Micrófono |
+| `both` | Interno + micrófono (`voice-performance`) |
+| `none` | Sin audio |
+
+Notas de audio:
+
+- **Interno**: captura el audio de las apps y, con `--audio-dup`, sigue sonando por el teléfono.
+- **Micrófono**: usa la fuente `mic` de scrcpy.
+- **Interno + micrófono**: scrcpy usa `voice-performance`, que mezcla micrófono y reproducción del dispositivo. La disponibilidad depende del fabricante.
+- **Sin audio**: graba solo video; la conversión a MP4 no agrega pista AAC.
 
 ## Detección de ADB
 

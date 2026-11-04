@@ -13,6 +13,7 @@ public final class Config {
     public static final String KEY_CODEC = "codec";  // "h264" | "h265"
     public static final String KEY_BITRATE = "bitrate"; // 0..100 (0 = automatico)
     public static final String KEY_ABITRATE = "abitrate"; // 128 | 256 | 320
+    public static final String KEY_ASOURCE = "asource"; // playback | mic | both | none
 
     private Config() {}
 
@@ -25,6 +26,7 @@ public final class Config {
     public static String codec(Context c) { return sp(c).getString(KEY_CODEC, "h264"); }
     public static int    bitrate(Context c){ return sp(c).getInt(KEY_BITRATE,   0); }
     public static int    abitrate(Context c){ return sp(c).getInt(KEY_ABITRATE, 128); }
+    public static String asource(Context c) { return sp(c).getString(KEY_ASOURCE, "playback"); }
 
     /** max-size que scrcpy debe usar, calculado segun las dimensiones reales
      * de la pantalla y el preset (la dimension corta del target). */
@@ -66,13 +68,15 @@ public final class Config {
         return r + "p";
     }
 
-    public static void save(Context c, String res, String fps, String codec, int bitrate, int abitrate) {
+    public static void save(Context c, String res, String fps, String codec,
+                            int bitrate, int abitrate, String asource) {
         sp(c).edit()
             .putString(KEY_RES, res)
             .putString(KEY_FPS, fps)
             .putString(KEY_CODEC, codec)
             .putInt(KEY_BITRATE, bitrate)
             .putInt(KEY_ABITRATE, abitrate)
+            .putString(KEY_ASOURCE, asource)
             .apply();
     }
 }

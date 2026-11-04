@@ -69,7 +69,7 @@ public class ScreenTileService extends TileService {
         if (target) {
             runInTermux("start", Config.maxSize(this), Config.fps(this),
                     Config.codec(this), String.valueOf(Config.bitrate(this)),
-                    String.valueOf(Config.abitrate(this)) + "K");
+                    String.valueOf(Config.abitrate(this)) + "K", Config.asource(this));
         } else {
             runInTermux("stop");
         }
@@ -135,13 +135,13 @@ public class ScreenTileService extends TileService {
     }
 
     private void runInTermux(final String action) {
-        runInTermux(action, null, null, null, null, null);
+        runInTermux(action, null, null, null, null, null, null);
     }
 
     private void runInTermux(final String action,
                              final String maxSize, final String fps,
                              final String codec, final String videoBitrate,
-                             final String audioBitrate) {
+                             final String audioBitrate, final String audioSource) {
         Intent i = new Intent();
         i.setClassName(TERMUX_PKG, TERMUX_SERVICE);
         i.setAction(ACTION_RUN);
@@ -155,7 +155,8 @@ public class ScreenTileService extends TileService {
                     fps != null ? fps : "60",
                     codec != null ? codec : "h264",
                     videoBitrate != null ? videoBitrate : "0",
-                    audioBitrate != null ? audioBitrate : "128K"};
+                    audioBitrate != null ? audioBitrate : "128K",
+                    audioSource != null ? audioSource : "playback"};
         } else {
             args = new String[]{SCRIPT, action};
         }
