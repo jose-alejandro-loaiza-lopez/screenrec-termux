@@ -65,9 +65,8 @@ if [ "${#TO_REMOVE[@]}" -gt 0 ]; then
     }
 fi
 
-# Limpia dependencias huerfanas y .deb descargados.
-pkg autoremove -y || true
-pkg clean || true
+pkg autoremove -y >/dev/null 2>&1 || apt autoremove -y || apt-get autoremove -y || true
+apt clean >/dev/null 2>&1 || pkg clean >/dev/null 2>&1 || true
 
 echo
 echo "Espacio disponible en Termux:"
